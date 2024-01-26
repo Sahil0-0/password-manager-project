@@ -1,0 +1,69 @@
+if (System.getProperty("design.codeux.ndkVersion") == null) {
+//    println("Setting ndkVersion")
+    if (rootProject.hasProperty('design.codeux.ndkVersion')) {
+        System.setProperty("design.codeux.ndkVersion", rootProject.getProperty("design.codeux.ndkVersion"))
+    } else {
+        System.setProperty("design.codeux.ndkVersion", "22.1.7171670")
+    }
+}
+println("ndkVersion: ${System.getProperty("design.codeux.ndkVersion")}")
+
+buildscript {
+    ext.kotlin_version = '1.8.10'
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.1.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+    if (project.path == ":file_picker_writable" || project.path == ":flutter_email_sender") {
+        apply plugin: 'com.android.library'
+        apply plugin: 'kotlin-android'
+        kotlin {
+            jvmToolchain(17)
+        }
+    }
+//    if (project.path == ":biometric_storage") {
+//        apply plugin: 'com.android.library'
+//        apply plugin: 'kotlin-android'
+//        dependencies {
+//            implementation "org.slf4j:slf4j-api:2.0.7"
+//        }
+//    }
+
+    if (project.path == ":flutter_zxing") {
+        apply plugin: 'com.android.library'
+        android {
+            namespace "com.markosyan.flutter_zxing"
+        }
+    }
+    if (project.path == ":open_file") {
+        apply plugin: 'com.android.library'
+        android {
+            namespace "com.crazecoder.openfile"
+        }
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

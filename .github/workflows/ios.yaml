@@ -1,0 +1,33 @@
+name: iOS Build/Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      blubb:
+        description: 'Never Mind'
+        required: false
+        default: ''
+  push:
+    branches:
+      - 'stable'
+      - 'beta'
+
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: ci-install-deps
+        env:
+          BLACKBOX_SECRET: ${{ secrets.BLACKBOX_SECRET_KEY }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: "./authpass/_tools/ci-install-deps.sh ios"
+      - name: 'ci-releaes ios'
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: "./authpass/_tools/ci-release.sh ios"
+
+
